@@ -638,10 +638,9 @@ kind: Service
 metadata:
   name: frontend
 spec:
-  type: NodePort # for external communication
+  type: LoadBalancer # For more secure external communication (We will use Cloud Provider's Load Balancer) 😊
   selector:
     app: frontend
   ports:
     - port: 80
       targetPort: 8080
-      nodePort: 30001
