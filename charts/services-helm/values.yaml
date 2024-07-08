@@ -1,0 +1,4 @@
+replicaCount: 1
+serviceType: ClusterIP
+appVersion: v0.10.0
+

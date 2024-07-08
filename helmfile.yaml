@@ -1,0 +1,50 @@
+releases:
+  - name: redis-cart
+    chart: charts/redis-helm
+    values:
+      - values/redis-cart-values.yml
+  
+  - name: cart-service
+    chart: charts/services-helm
+    values:
+      - values/cart-service-values.yml 
+  
+  - name: currency-service
+    chart: charts/services-helm
+    values:
+      - values/currency-service-values.yml 
+  
+  - name: payment-service
+    chart: charts/services-helm
+    values:
+      - values/payment-service-values.yml
+
+  - name: recommendation-service
+    chart: charts/services-helm
+    values:
+      - values/recommendation-service-values.yml
+
+  - name: product-catalog-service
+    chart: charts/services-helm
+    values:
+      - values/product-catalog-service-values.yml
+
+  - name: shipping-service
+    chart: charts/services-helm
+    values:
+      - values/shipping-service-values.yml
+
+  - name: ad-service
+    chart: charts/services-helm
+    values:
+      - values/ad-service-values.yml
+
+  - name: checkout-services-helm
+    chart: charts/services-helm
+    values:
+      - values/checkout-service-values.yml
+
+  - name: frontend-service
+    chart: charts/services-helm
+    values:
+      - values/frontend-service-values.yml

@@ -1,0 +1,13 @@
+appName: shippingservice
+
+appImage: gcr.io/google-samples/microservices-demo/shippingservice
+
+containerPort: 50051
+
+containerEnvVars:
+  - name: PORT
+    value: "50051"
+  - name: DISABLE_PROFILER
+    value: "1"
+
+servicePort: 50051

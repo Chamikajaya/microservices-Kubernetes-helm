@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.appName }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.appName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appName }}
+    spec:
+      containers:
+        - name: {{ .Values.appName }}
+          image: "{{ .Values.appImage }}:{{ .Values.appVersion }}"
+          ports:
+            - containerPort: {{ .Values.containerPort }}
+          livenessProbe:
+            periodSeconds: 5
+            tcpSocket: 
+              port: {{ .Values.containerPort }}
+          readinessProbe:
+            periodSeconds: 5
+            tcpSocket:
+              port: {{ .Values.containerPort }}
+          resources:
+            limits:
+              memory: 256Mi
+              cpu: 125m
+            requests:
+              cpu: 70m
+              memory: 200Mi
+
+          volumeMounts:
+            - name: {{ .Values.volumeName }}
+              mountPath: {{ .Values.containerVolumeMountPath }}
+      # pod level -->
+      volumes:
+        - name: {{ .Values.volumeName }}
+          emptyDir: {} 
