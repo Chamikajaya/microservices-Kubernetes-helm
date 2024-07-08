@@ -1,0 +1,647 @@
+# Email Service Resources
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emailservice
+spec:
+  selector:
+    matchLabels:
+      app: emailservice
+  template:
+    metadata:
+      labels:
+        app: emailservice
+    spec:
+      containers:
+        - name: emailservice
+          image: gcr.io/google-samples/microservices-demo/emailservice:v0.10.0
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PORT
+              value: "8080"
+            - name: DISABLE_PROFILER
+              value: "1"
+          # every 5 seconds the kubelet will send a request to the /healthz endpoint to check the health of the container
+          # here we are using grpc protocol for health checks, we could also use http GET , TCP or exec commands for health checks
+          livenessProbe:
+            periodSeconds: 5
+            grpc:
+              port: 8080
+          readinessProbe:
+            periodSeconds: 5
+            grpc:
+              port: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emailservice
+spec:
+  selector:
+    app: emailservice
+  ports:
+    - port: 5000
+      targetPort: 8080
+
+---
+# Recommendation Service Resources
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommendationservice
+spec:
+  selector:
+    matchLabels:
+      app: recommendationservice
+  template:
+    metadata:
+      labels:
+        app: recommendationservice
+    spec:
+      containers:
+        - name: recommendationservice
+          image: gcr.io/google-samples/microservices-demo/recommendationservice:v0.10.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PORT
+              value: "8080"
+            - name: PRODUCT_CATALOG_SERVICE_ADDR # Since this service talks to the product catalog service, we need to provide the address of the product catalog service
+              value: "productcatalogservice:3550" # service (resource) name and port of the product catalog service object
+            - name: DISABLE_PROFILER
+              value: "1"
+          livenessProbe:
+            periodSeconds: 5
+            grpc:
+              port: 8080
+          readinessProbe:
+            periodSeconds: 5
+            grpc:
+              port: 8080
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 220Mi
+            limits:
+              cpu: 200m
+              memory: 450Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recommendationservice
+spec:
+  selector:
+    app: recommendationservice
+  ports:
+    - port: 8080
+      targetPort: 8080
+
+---
+# Product Catalog Service Resources
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: productcatalogservice
+spec:
+  selector:
+    matchLabels:
+      app: productcatalogservice
+  template:
+    metadata:
+      labels:
+        app: productcatalogservice
+    spec:
+      containers:
+        - name: productcatalogservice
+          image: gcr.io/google-samples/microservices-demo/productcatalogservice:v0.10.0
+          ports:
+            - containerPort: 3550
+          livenessProbe:
+            periodSeconds: 5
+            grpc:
+              port: 3550
+          readinessProbe:
+            grpc:
+              port: 3550
+
+          env:
+            - name: PORT
+              value: "3550"
+            - name: DISABLE_PROFILER
+              value: "1"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: productcatalogservice
+spec:
+  selector:
+    app: productcatalogservice
+  ports:
+    - port: 3550
+      targetPort: 3550
+
+---
+# Payment Service Resources
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paymentservice
+spec:
+  selector:
+    matchLabels:
+      app: paymentservice
+  template:
+    metadata:
+      labels:
+        app: paymentservice
+    spec:
+      containers:
+        - name: paymentservice
+          image: gcr.io/google-samples/microservices-demo/paymentservice:v0.10.0
+          ports:
+            - containerPort: 50051
+          livenessProbe:
+            periodSeconds: 5
+            grpc:
+              port: 50051
+          readinessProbe:
+            grpc:
+              port: 50051
+
+          env:
+            - name: PORT
+              value: "50051"
+            - name: DISABLE_PROFILER
+              value: "1"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: paymentservice
+spec:
+  selector:
+    app: paymentservice
+  ports:
+    - port: 50051
+      targetPort: 50051
+
+---
+# Currency Service Resources
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: currencyservice
+spec:
+  selector:
+    matchLabels:
+      app: currencyservice
+  template:
+    metadata:
+      labels:
+        app: currencyservice
+    spec:
+      containers:
+        - name: currencyservice
+          image: gcr.io/google-samples/microservices-demo/currencyservice:v0.10.0
+          ports:
+            - containerPort: 7000
+          livenessProbe:
+            periodSeconds: 5
+            grpc:
+              port: 7000
+          readinessProbe:
+            grpc:
+              port: 7000
+
+          env:
+            - name: PORT
+              value: "7000"
+            - name: DISABLE_PROFILER
+              value: "1"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: currencyservice
+spec:
+  selector:
+    app: currencyservice
+  ports:
+    - port: 7000
+      targetPort: 7000
+
+---
+# Shipping Service Resources
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shippingservice
+spec:
+  selector:
+    matchLabels:
+      app: shippingservice
+  template:
+    metadata:
+      labels:
+        app: shippingservice
+    spec:
+      containers:
+        - name: shippingservice
+          image: gcr.io/google-samples/microservices-demo/shippingservice:v0.10.0
+          ports:
+            - containerPort: 50051
+          livenessProbe:
+            periodSeconds: 5
+            grpc:
+              port: 50051
+          readinessProbe:
+            periodSeconds: 5
+            grpc:
+              port: 50051
+
+          env:
+            - name: PORT
+              value: "50051"
+            - name: DISABLE_PROFILER
+              value: "1"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shippingservice
+spec:
+  selector:
+    app: shippingservice
+  ports:
+    - port: 50051
+      targetPort: 50051
+
+---
+# Ad Service Resources
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adservice
+spec:
+  selector:
+    matchLabels:
+      app: adservice
+  template:
+    metadata:
+      labels:
+        app: adservice
+    spec:
+      containers:
+        - name: adservice
+          image: gcr.io/google-samples/microservices-demo/adservice:v0.10.0
+          ports:
+            - containerPort: 9555
+          livenessProbe:
+            periodSeconds: 5
+            grpc:
+              port: 9555
+          readinessProbe:
+            initialDelaySeconds: 20
+            periodSeconds: 15
+            grpc:
+              port: 9555
+
+          env:
+            - name: PORT
+              value: "9555"
+
+          resources:
+            requests:
+              cpu: 200m
+              memory: 180Mi
+            limits:
+              cpu: 300m
+              memory: 300Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: adservice
+spec:
+  selector:
+    app: adservice
+  ports:
+    - port: 9555
+      targetPort: 9555
+---
+# Cart Service Resources
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cartservice
+spec:
+  selector:
+    matchLabels:
+      app: cartservice
+  template:
+    metadata:
+      labels:
+        app: cartservice
+    spec:
+      containers:
+        - name: cartservice
+          image: gcr.io/google-samples/microservices-demo/cartservice:v0.10.0
+          ports:
+            - containerPort: 7070
+          livenessProbe:
+            initialDelaySeconds: 15 # wait for 15 seconds before starting the liveness probe
+            periodSeconds: 5
+            grpc:
+              port: 7070
+          readinessProbe:
+            initialDelaySeconds: 15
+            grpc:
+              port: 7070
+
+          env:
+            - name: PORT
+              value: "7070"
+            - name: REDIS_ADDR
+              value: "redis-cart:6379" # since cart service talks to redis, we need to provide the address of the redis service
+            - name: DISABLE_PROFILER
+              value: "1"
+          resources:
+            requests:
+              cpu: 200m
+              memory: 64Mi
+            limits:
+              cpu: 300m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cartservice
+spec:
+  selector:
+    app: cartservice
+  ports:
+    - port: 7070
+      targetPort: 7070
+---
+# Redis Resources for Cart Service
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-cart
+spec:
+  selector:
+    matchLabels:
+      app: redis-cart
+  template:
+    metadata:
+      labels:
+        app: redis-cart
+    spec:
+      containers:
+        - name: redis-cart
+          image: redis:alpine
+          ports:
+            - containerPort: 6379
+          livenessProbe:
+            periodSeconds: 5
+            tcpSocket: # using tcpSocket for health checks
+              port: 6379
+          readinessProbe:
+            periodSeconds: 5
+            tcpSocket:
+              port: 6379
+          resources:
+            limits:
+              memory: 256Mi
+              cpu: 125m
+            requests:
+              cpu: 70m
+              memory: 200Mi
+
+          # container level --> mounting the emptyDir volume
+          volumeMounts:
+            - name: redis-cart-data
+              mountPath: /data # mounting the volume to /data directory in the container
+      # pod level -->
+      volumes:
+        - name: redis-cart-data
+          emptyDir: {} # We are using emptyDir volume for redis data storage , not persistent volumes, because redis is an in-memory database and a cache, so it is okay to lose data in case of pod restarts. However data will be persisted in case of container restarts. 😊
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-cart
+spec:
+  selector:
+    app: redis-cart
+  ports:
+    - port: 6379
+      targetPort: 6379
+
+---
+# Checkout Service Resources
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkoutservice
+spec:
+  selector:
+    matchLabels:
+      app: checkoutservice
+  template:
+    metadata:
+      labels:
+        app: checkoutservice
+    spec:
+      containers:
+        - name: checkoutservice
+          image: gcr.io/google-samples/microservices-demo/checkoutservice:v0.10.0
+          ports:
+            - containerPort: 5050
+          livenessProbe:
+            periodSeconds: 5
+            grpc:
+              port: 5050
+          readinessProbe:
+            grpc:
+              port: 5050
+          env:
+            - name: PORT
+              value: "5050"
+              # Checkout service talks to Email, Product Catalog, Shipping, Payment, Currency and Cart services, so we need to provide the address of these services
+            - name: PRODUCT_CATALOG_SERVICE_ADDR
+              value: "productcatalogservice:3550"
+            - name: SHIPPING_SERVICE_ADDR
+              value: "shippingservice:50051"
+            - name: PAYMENT_SERVICE_ADDR
+              value: "paymentservice:50051"
+            - name: EMAIL_SERVICE_ADDR
+              value: "emailservice:5000"
+            - name: CURRENCY_SERVICE_ADDR
+              value: "currencyservice:7000"
+            - name: CART_SERVICE_ADDR
+              value: "cartservice:7070"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: checkoutservice
+spec:
+  selector:
+    app: checkoutservice
+  ports:
+    - port: 5050
+      targetPort: 5050
+
+---
+# Frontend Service Resources
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: gcr.io/google-samples/microservices-demo/frontend:v0.10.0
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            initialDelaySeconds: 10
+            # HTTP GET request should be used to check the container's health.
+            httpGet:
+              path: "/_healthz" # path that the probe should hit to check the container's health
+              port: 8080
+              httpHeaders:
+                - name: "Cookie"
+                  value: "shop_session-id=x-liveness-probe"
+          readinessProbe:
+            initialDelaySeconds: 10
+            httpGet:
+              path: "/_healthz"
+              port: 8080
+              httpHeaders:
+                - name: "Cookie"
+                  value: "shop_session-id=x-readiness-probe"
+
+          env:
+            - name: PORT
+              value: "8080"
+            - name: PRODUCT_CATALOG_SERVICE_ADDR
+              value: "productcatalogservice:3550"
+            - name: CURRENCY_SERVICE_ADDR
+              value: "currencyservice:7000"
+            - name: CART_SERVICE_ADDR
+              value: "cartservice:7070"
+            - name: RECOMMENDATION_SERVICE_ADDR
+              value: "recommendationservice:8080"
+            - name: SHIPPING_SERVICE_ADDR
+              value: "shippingservice:50051"
+            - name: CHECKOUT_SERVICE_ADDR
+              value: "checkoutservice:5050"
+            - name: AD_SERVICE_ADDR
+              value: "adservice:9555"
+            - name: SHOPPING_ASSISTANT_SERVICE_ADDR
+              value: "shoppingassistantservice:80"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  type: ClusterIP # for internal communication
+  selector:
+    app: frontend
+  ports:
+    - port: 80
+      targetPort: 8080
+
+---
+# for external communication
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  type: NodePort # for external communication
+  selector:
+    app: frontend
+  ports:
+    - port: 80
+      targetPort: 8080
+      nodePort: 30001
