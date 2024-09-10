@@ -1,3 +1,12 @@
+# ! Some Best practices I followed -->
+
+# * Used images with specific tags
+# * used liveness probing & readiness probing
+# * configured resource requests & limits (so that particular container will not consume all cluster resources) for containers :)
+# * Did not use NodePort type, rather used load balancer svc obj type to expose the cluster to external traffic
+
+# ? Could have used different namespaces
+
 # Email Service Resources
 apiVersion: apps/v1
 kind: Deployment
@@ -463,7 +472,7 @@ spec:
               port: 6379
           resources:
             limits:
-              memory: 256Mi
+              memory: 256Mi # ! configured more memory resources to redis since it is a cache
               cpu: 125m
             requests:
               cpu: 70m
@@ -476,7 +485,7 @@ spec:
       # pod level -->
       volumes:
         - name: redis-cart-data
-          emptyDir: {} # We are using emptyDir volume for redis data storage , not persistent volumes, because redis is an in-memory database and a cache, so it is okay to lose data in case of pod restarts. However data will be persisted in case of container restarts. 😊
+          emptyDir: {} # * We are using emptyDir volume for redis data storage , not persistent volumes, because redis is an in-memory database and a cache, so it is okay to lose data in case of pod restarts. However data will be persisted in case of container restarts. 😊
 ---
 apiVersion: v1
 kind: Service

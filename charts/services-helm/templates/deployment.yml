@@ -17,6 +17,8 @@ spec:
           image: "{{ .Values.appImage }}:{{ .Values.appVersion }}"
           ports:
             - containerPort: {{ .Values.containerPort }}
+          
+          # * Since we have to set multiple environment variables, we have to use following syntax ==>
           env:
             {{- range .Values.containerEnvVars}}  
             - name: {{ .name }} 
